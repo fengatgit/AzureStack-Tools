@@ -1,4 +1,4 @@
-﻿<#
+<#
 
 .SYNOPSIS
 
@@ -1431,17 +1431,27 @@ Param (
 [string]$Package = $args[7]
 )
 
+#logout-AzureRm if it existed.
+
+$Exist  = Get-AzureRmLocation -ErrorAction Ignore | Select-Object -ExpandProperty location
+while($Exist)
+{
+    Logout-AzureRmAccount -ErrorAction SilentlyContinue -ErrorVariable $null
+
+    $Exist  = Get-AzureRmLocation -ErrorAction Ignore | Select-Object -ExpandProperty location
+}
+
 # log
 Write-Output 'Verifying API endpoint'
 # activity
 try {
     $endpoint_test = Invoke-WebRequest https://$apiEndpoint/metadata/endpoints?api-version=1.0 -ErrorAction SilentlyContinue
     if ($endpoint_test.StatusCode -eq 200){
-    Write-Output 'Api Endpoint is valid'
+    Write-Output 'ARM Endpoint is valid'
     }
     }
 catch {
-    Write-Output 'Unable to connect to Api Endpoint'
+    Write-Output 'Unable to connect to ARM Endpoint'
     Write-Output 'Publishing job cancelled'
     Exit
     }
@@ -1468,7 +1478,8 @@ $EnvAzureStackAdmin = Add-AzureRmEnvironment -Name 'AzureStackCloud' `
 Write-Output 'Add account to environment'
 # activity
 $EnvAccountAzureStackAdmin = Add-AzureRmAccount -Environment $EnvAzureStackAdmin -Credential $AdminCreds
-$rmProfile = Select-AzureRmProfile -Profile $EnvAccountAzureStackAdmin
+#$rmProfile = Select-AzureRmProfile -Profile $EnvAccountAzureStackAdmin
+$ResourceGroupLocation = Get-AzureRmLocation | Select-Object -ExpandProperty Location
 
 # log
 Write-Output 'Select default subscription'
@@ -1512,6 +1523,8 @@ Write-Output 'Create Storage Context'
 
 #activity
 $StorageContext = New-AzureStorageContext -StorageAccountName $StorageAccountName -StorageAccountKey $StorageKeys.Key1 -Endpoint ($apiEndpoint.Substring($apiEndpoint.IndexOf(".") + 1))
+$key1 = $StorageKeys | Where-Object {$_.KeyName -eq "key1" } | Select-Object -ExpandProperty Value
+$StorageContext = New-AzureStorageContext -StorageAccountName $StorageAccountName -StorageAccountKey $Key1 -Endpoint ($apiEndpoint.Substring($apiEndpoint.IndexOf(".") + 1))
 
 #condition
 $Exists = Get-AzureStorageContainer -Context $StorageContext -ErrorAction SilentlyContinue | where {$_.name -eq $StorageContainerName}
@@ -1532,15 +1545,15 @@ Write-Output "Verify Publisher/Name/Version is unique"
 
 # Activity
 $tempfolder = new-item "$env:TEMP\azpkg" -ItemType Directory -Force
-Copy-Item -Path $package -Destination ($tempfolder.FullName + '\package.zip')
-Expand-Archive -Path ($tempfolder.FullName + '\package.zip') -DestinationPath $tempfolder.FullName
+Copy-Item -Path $package -Destination ($tempfolder.FullName + '\package.zip') -Force
+Expand-Archive -Path ($tempfolder.FullName + '\package.zip') -DestinationPath $tempfolder.FullName -Force
 $manifest = Get-Content -Path ($tempfolder.FullName + '\manifest.json') | ConvertFrom-Json
 Remove-item $tempfolder -Force -Recurse
 $appName = ($manifest.publisher + '.' + $manifest.name + '.' + $manifest.version)
 
 #condition
-$Exists = Get-AzureRMGalleryItem -ErrorAction SilentlyContinue | where {$_.name -eq $appName}
-if ($Exists) { 
+$Exists = Get-AzSGalleryItem -ErrorAction SilentlyContinue | where {$_.name -eq $appName}
+if ($Exists) {
     Write-Output "The Publisher/Name/Version already exists"
     Write-Output "Package not published"
     exit
@@ -1549,16 +1562,24 @@ Else {
     # log
     Write-Output 'Upload package to storage container'
     # activity
-    $blob = Set-AzureStorageBlobContent -Container $StorageContainerName -File $package -Context $StorageContext -Force
+    $blob = Set-AzureStorageBlobContent -Container $StorageContainerName -File $package -Context $StorageContext  -ErrorAction SilentlyContinue -Verbose -Force
     #log
     Write-Output 'Publish package to Marketplace'
     #activity
-    $publish = Add-AzureRMGalleryItem -GalleryItemUri ($blob.context.BlobEndPoint + $StorageContainerName + '/' + $blob.Name) -Verbose 
+    $blobURL = $blob.context.BlobEndPoint + $StorageContainerName + '/' + $blob.Name
+    $publish = Add-AzsGalleryItem -GalleryItemUri $blobURL -ErrorAction SilentlyContinue -Verbose -Force
+
     }
-
-if ($publish.StatusCode -eq '201'){ write-output 'Completed succesfully' }
+<#
+if ($publish.StatusCode -eq '201'){ write-output 'Completed successfully' }
 else { write-output 'Publish item failed' }
+#>
+    if ($publish.Id -ne $null){
+         write-output 'Completed succesfully'
+         #write-host $publish.Id
+    }else { write-output 'Publish item failed' }
 
+    Logout-AzureRmAccount -ErrorAction Ignore
 }
 
 #endregion
