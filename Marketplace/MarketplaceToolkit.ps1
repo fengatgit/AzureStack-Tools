@@ -6,8 +6,8 @@ The Marketplace Toolkit script for Microsoft Azure Stack provides service admini
 
 .DESCRIPTION
 
-The Marketplace Toolkit script provides a UI experience to create and upload marketplace items to the Azure Stack marketplace. The tool consists of PowerShell and XAML. XAML uses the Windows Presentation Foundation to render the UI. 
-The toolkit allows you to 
+The Marketplace Toolkit script provides a UI experience to create and upload marketplace items to the Azure Stack marketplace. The tool consists of PowerShell and XAML. XAML uses the Windows Presentation Foundation to render the UI.
+The toolkit allows you to
 - Create and publish a solution for the marketplace. This accepts any main ARM template and allows you to define the tenant deployment experience, by creating steps, reassinging and re-ordering parameters.
 - Create and publish an extension for the marketplace. This creates a marketplace item for a VM Extension template that will surface on the extension tab of a deployed virtual machine.
 - Publish an existing package. If you have an existing marketplace item package (.azpkg file), the publish wizard enables an easy wizard to publish the package to the marketplace.
@@ -32,7 +32,7 @@ The Marketplace Toolkit script for Microsoft Azure Stack is based on PowerShell 
 
 #region XAML
 $XAML = @'
-<Window 
+<Window
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:WpfApplication1"
@@ -602,7 +602,7 @@ $XAML = @'
 
                                         <StackPanel Orientation="Horizontal" Width="258" Height="25" >
                                             <Label Content="*" Foreground="red"/>
-                                            <Label Content="API endpoint" />
+                                            <Label Content="ARM endpoint" />
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal" Width="258" Height="23" Margin="0,0,0,8" ToolTipService.InitialShowDelay="0" ToolTipService.ShowDuration="2147483647" >
                                             <TextBox x:Name="Publish_Tbx_Endpoint" Width="258" />
@@ -711,26 +711,26 @@ $Script:validation_error = $false
 
 # Validation Conditions
 if ($regex){
-    if (($field_value.Length -gt 0) -and ($field_value -notmatch "^($regex)$")) { 
-        $Script:validation_error = $true 
+    if (($field_value.Length -gt 0) -and ($field_value -notmatch "^($regex)$")) {
+        $Script:validation_error = $true
         }
 }
 if ($compare){
-    if (($field_value.Length -gt 0) -and ($field_value -ne $compare)) { 
-        $Script:validation_error = $true 
+    if (($field_value.Length -gt 0) -and ($field_value -ne $compare)) {
+        $Script:validation_error = $true
         $message = "Passwords do not match"
         }
     }
-if ($extension){ 
+if ($extension){
     if ($field_value.Length -gt 0){
         if (test-path $field_value){
             if ((get-item $field_value).Extension -ne $extension){
-            $Script:validation_error = $true 
+            $Script:validation_error = $true
             $message = 'Not a valid file'
             }
         }
         if (!(test-path $field_value)){
-            $Script:validation_error = $true 
+            $Script:validation_error = $true
             $message = 'Not a valid file'
         }
     }
@@ -739,10 +739,10 @@ if ($image){
     if (($field_value.Length -gt 0) -and (test-path $field_value)){
         if ((get-item $field_value).Extension -eq $extension){
             $dimensions = [System.Drawing.Image]::Fromfile((Get-Item $field_value))
-    
-            if (($dimensions.width -ne $image.width) -or ($dimensions.height -ne $image.height)){ 
+
+            if (($dimensions.width -ne $image.width) -or ($dimensions.height -ne $image.height)){
                 $Script:validation_error = $true
-                $message = ($message + " The selected image is " + $dimensions.width + "x" + $dimensions.height) 
+                $message = ($message + " The selected image is " + $dimensions.width + "x" + $dimensions.height)
                 }
             }
         }
@@ -750,21 +750,21 @@ if ($image){
 if ($vmextension){
     if ($Script:PackageType -eq 'Extension'){
         $ContentJSON = Get-Content ($field_value) -Raw
-        $params = ($ContentJSON | ConvertFrom-Json).parameters 
+        $params = ($ContentJSON | ConvertFrom-Json).parameters
         $params = $params.psobject.members | where {$_.membertype -eq 'NoteProperty'}
-        if (($params | where {(($_.name -eq 'vmName') -and ($_.value.type -eq 'string')) -or (($_.name -eq 'location') -and ($_.value.type -eq 'string'))}).count -lt 2){ 
-        $Script:validation_error = $true 
+        if (($params | where {(($_.name -eq 'vmName') -and ($_.value.type -eq 'string')) -or (($_.name -eq 'location') -and ($_.value.type -eq 'string'))}).count -lt 2){
+        $Script:validation_error = $true
         $message = 'Required string parameters "vmName" or/and  "location" not found in template'
         }
 }
 }
-if ($nocondition){ 
-        $Script:validation_error = $true 
+if ($nocondition){
+        $Script:validation_error = $true
 }
 if ($empty){
-    if ($field_value.length -eq 0) { 
+    if ($field_value.length -eq 0) {
         $message = 'Required field'
-        $Script:validation_error = $true 
+        $Script:validation_error = $true
     }
 }
 
@@ -787,7 +787,7 @@ if ($Script:validation_error) {
         $control.value.Width = ([int]$columnwidth - [int]15)
         $control.value.BorderBrush="Red"
         #child button
-        $button = $control.value.parent.children | where {$_.GetType().fullname -eq 'System.Windows.Controls.Button' -and $_.Content -eq '!'} 
+        $button = $control.value.parent.children | where {$_.GetType().fullname -eq 'System.Windows.Controls.Button' -and $_.Content -eq '!'}
         $button.visibility = 'Visible'
         }
  else {
@@ -797,7 +797,7 @@ if ($Script:validation_error) {
         $control.value.Width = $columnwidth
         $control.value.BorderBrush="#FFABADB3"
         #child button
-        $button = $control.value.parent.children | where {$_.GetType().fullname -eq 'System.Windows.Controls.Button' -and $_.Content -eq '!'} 
+        $button = $control.value.parent.children | where {$_.GetType().fullname -eq 'System.Windows.Controls.Button' -and $_.Content -eq '!'}
         $button.visibility = 'Collapsed'
         }
 }
@@ -842,7 +842,7 @@ Param(
 )
 
 $ContentJSON = Get-Content ($File)
-$params = ($ContentJSON | ConvertFrom-Json).parameters 
+$params = ($ContentJSON | ConvertFrom-Json).parameters
 $params = $params.psobject.properties
 
 if ($Script:PackageType -eq 'Extension'){
@@ -865,11 +865,11 @@ $params | foreach {
     if ($Script:PackageType -eq 'Solution') {$param | Add-Member -Type NoteProperty -Name step -Value "basics"}
     if ($Script:PackageType -eq 'Extension') {$param | Add-Member -Type NoteProperty -Name step -Value "elements"}
     $param | Add-Member -Type NoteProperty -Name tag -Value $count
-    if (($_.value.type -eq 'string') -and (!($_.value.allowedValues))) {  
-        $param | Add-Member -Type NoteProperty -Name uiType -Value "Microsoft.Common.TextBox" 
+    if (($_.value.type -eq 'string') -and (!($_.value.allowedValues))) {
+        $param | Add-Member -Type NoteProperty -Name uiType -Value "Microsoft.Common.TextBox"
         $param | Add-Member -Type NoteProperty -Name constraints -Value $false
         }
-    if (($_.value.type -eq 'string') -and ($_.value.allowedValues)) {  
+    if (($_.value.type -eq 'string') -and ($_.value.allowedValues)) {
         $param | Add-Member -Type NoteProperty -Name uiType -Value "Microsoft.Common.DropDown"
         $param | Add-Member -Type NoteProperty -Name constraints -Value $true
         $allowedValues = @()
@@ -881,14 +881,14 @@ $params | foreach {
             }
         $param | Add-Member -Type NoteProperty -Name allowedValues -Value $allowedValues
         }
-    if ($_.value.type -eq 'int') {  
-        $param | Add-Member -Type NoteProperty -Name uiType -Value "Microsoft.Common.TextBox" 
+    if ($_.value.type -eq 'int') {
+        $param | Add-Member -Type NoteProperty -Name uiType -Value "Microsoft.Common.TextBox"
         $param | Add-Member -Type NoteProperty -Name constraints -Value $true
         $param | Add-Member -Type NoteProperty -Name regex -Value '^\d+$'
         $param | Add-Member -Type NoteProperty -Name validationMessage -Value 'Only numeric characters are allowed, and it must be a positive value'
         }
-    if ($_.value.type -eq 'securestring') {  
-        $param | Add-Member -Type NoteProperty -Name uiType -Value "Microsoft.Common.PasswordBox" 
+    if ($_.value.type -eq 'securestring') {
+        $param | Add-Member -Type NoteProperty -Name uiType -Value "Microsoft.Common.PasswordBox"
         $param | Add-Member -Type NoteProperty -Name constraints -Value $false
         }
 
@@ -970,21 +970,21 @@ Param(
 )
 
 # if the selected item is a step (by checking the tag of the parent item) AND if the selected item is not the "Basics" step AND if the selected item does not have any items.
-if (($x_Params_Tree_View.SelectedItem.parent.tag -eq '@TreeViewRoot@') -and ($x_Params_Tree_View.SelectedItem.header -ne 'Basics') -and (!($x_Params_Tree_View.SelectedItem.HasItems))) { 
+if (($x_Params_Tree_View.SelectedItem.parent.tag -eq '@TreeViewRoot@') -and ($x_Params_Tree_View.SelectedItem.header -ne 'Basics') -and (!($x_Params_Tree_View.SelectedItem.HasItems))) {
     # Remove the item from the treeview
     $X_Params_Tree_View.items.remove($x_Params_Tree_View.SelectedItem)
     # Remove the item from the Paramtype details dropdown
     $X_ParamType_Drp_Steps.Items.Remove($step)
     }
 # if the selected item is a step (by checking the tag of the parent item) AND if the selected item is not the "Basics" step AND if the selected item has items itself.
-elseif (($x_Params_Tree_View.SelectedItem.parent.tag -eq '@TreeViewRoot@') -and ($x_Params_Tree_View.SelectedItem.header -ne 'Basics') -and ($x_Params_Tree_View.SelectedItem.HasItems)) { 
+elseif (($x_Params_Tree_View.SelectedItem.parent.tag -eq '@TreeViewRoot@') -and ($x_Params_Tree_View.SelectedItem.header -ne 'Basics') -and ($x_Params_Tree_View.SelectedItem.HasItems)) {
     # Show validation messdage in the UI
     F_Validation -field 'X_Params_Tbx_RemoveStep' -nocondition -message 'You can only delete a step without params.' -columnwidth 180
     # TODO Is this step still required?
     $X_Params_Tbx_RemoveStep.Text = 'You can only delete a step without params.'
     }
 # if the selected item is a step (by checking the tag of the parent item) AND if the selected item is the "Basics" step
-elseif (($x_Params_Tree_View.SelectedItem.parent.tag -eq '@TreeViewRoot@') -and ($x_Params_Tree_View.SelectedItem.header -eq 'Basics') ) { 
+elseif (($x_Params_Tree_View.SelectedItem.parent.tag -eq '@TreeViewRoot@') -and ($x_Params_Tree_View.SelectedItem.header -eq 'Basics') ) {
     # Show Validation Message in the UI
     F_Validation -field 'X_Params_Tbx_RemoveStep' -nocondition -message 'The step basics cannot be removed.' -columnwidth 180
     }
@@ -995,7 +995,7 @@ Param(
 [string]$step
 )
 
-# if the selected item is a parameter (by checking the tag of the parent item) 
+# if the selected item is a parameter (by checking the tag of the parent item)
 if ($x_Params_Tree_View.SelectedItem.parent.tag -ne '@TreeViewRoot@'){
     # Get the current treeitem
     $treeitem = $x_Params_Tree_View.SelectedItem
@@ -1011,7 +1011,7 @@ if ($x_Params_Tree_View.SelectedItem.parent.tag -ne '@TreeViewRoot@'){
     if ($NumberofItems -eq 0){
         $treeitem.tag = 0}
     # if there are exisitng parameters in this step, set the tag of the current item with tag of the last parameter of the new step + 1
-    else { 
+    else {
     $LastItem = ($NewParent.Items | Sort-Object {$_.tag})[$NumberofItems -1]
     $treeitem.tag = ([int]$LastItem.tag +1)
     }
@@ -1023,7 +1023,7 @@ if ($x_Params_Tree_View.SelectedItem.parent.tag -ne '@TreeViewRoot@'){
     # Update the tag value of the $Script:Grid item to match the current item
     ($Script:Grid | where {$_.name -eq $treeitem.name}).tag = $treeitem.tag
     # Add the current item to the new step
-    
+
     }
 }
 
@@ -1032,11 +1032,11 @@ Param (
 [string]$Direction
 )
 
-# if the selected item is a parameter (by checking the tag of the parent item) 
+# if the selected item is a parameter (by checking the tag of the parent item)
 if ($x_Params_Tree_View.SelectedItem.parent.tag -ne '@TreeViewRoot@'){
 
-# Get the index number of the current selectItem from all items in the current step. Sorting by the tag value in each item. 
-$AllItemsinStep = ($X_Params_Tree_View.SelectedItem.Parent.Items | sort-object {$_.tag}) 
+# Get the index number of the current selectItem from all items in the current step. Sorting by the tag value in each item.
+$AllItemsinStep = ($X_Params_Tree_View.SelectedItem.Parent.Items | sort-object {$_.tag})
 $Index = $AllItemsinStep.IndexOf($X_Params_Tree_View.SelectedItem)
 
     If (($Direction -eq 'Up') -and ($Index -gt '0')){
@@ -1205,27 +1205,27 @@ if ($Script:PackageType -eq 'Extension'){
     $createUIDefinition_version='1.0.0'
     }
 
-$createUiDefinition = 
+$createUiDefinition =
     [pscustomobject]@{
     "handler"= ""
     "version"= ""
-    "parameters"= ""   
+    "parameters"= ""
 }
 
 $createUiDefinition.handler = "$createUIDefinition_handler"
 $createUiDefinition.version = "$createUIDefinition_version"
 if ($Script:PackageType -eq 'Solution'){
     $createUiDefinition.parameters =  [pscustomobject]@{
-            "basics" = ""; 
-            "steps" = @(); 
+            "basics" = "";
+            "steps" = @();
             "outputs"= ""
-            }  
+            }
     }
 if ($Script:PackageType -eq 'Extension'){
         $createUiDefinition.parameters =  [pscustomobject]@{
-            "elements" = ""; 
+            "elements" = "";
             "outputs"= ""
-            }  
+            }
     }
 #endregion
 
@@ -1245,7 +1245,7 @@ if ($Script:PackageType -eq 'Solution'){
                 "bladeTitle"= "$uiDef_step_name"
                 "elements"= $null
             }
-        $uiDef_steps += $uiDef_step 
+        $uiDef_steps += $uiDef_step
         }
 }
 #endregion
@@ -1293,7 +1293,7 @@ $script:grid | Sort-Object step, tag | forEach {
         }
     $uiDef_param.constraints.allowedValues = $uiDef_param.constraints.allowedValues += $uiDef_param_allowedValues_single
     }
-    
+
 }
     if ($_.uiType -eq 'Microsoft.Common.PasswordBox'){
     $uiDef_param = [pscustomobject]@{
@@ -1307,25 +1307,25 @@ $script:grid | Sort-Object step, tag | forEach {
         }
     }
 
-if ($_.step -eq 'elements') { 
+if ($_.step -eq 'elements') {
     # element
-    $uiDef_elements += $uiDef_param 
+    $uiDef_elements += $uiDef_param
     # output
     $uiDef_outputs += @{"$uiDef_param_name"="[$uiDef_param_step('$uiDef_param_name')]"}
     }
-elseif ($_.step -eq 'basics') { 
+elseif ($_.step -eq 'basics') {
     # element
-    $uiDef_basics += $uiDef_param 
+    $uiDef_basics += $uiDef_param
     # output
     $uiDef_outputs += @{"$uiDef_param_name"="[$uiDef_param_step('$uiDef_param_name')]"}
     }
-else { 
+else {
     # element
     foreach($i in $uiDef_steps){
-        if ($_.step.replace(' ','') -eq $i.name){ 
-            [array]$i.elements += $uiDef_param 
-            } 
-        } 
+        if ($_.step.replace(' ','') -eq $i.name){
+            [array]$i.elements += $uiDef_param
+            }
+        }
     #output
     $uiDef_outputs += @{"$uiDef_param_name"="[steps('$uiDef_param_step').$uiDef_param_name]"}
     }
@@ -1338,9 +1338,9 @@ if ($Script:PackageType -eq 'Solution') {
         $createUiDefinition.parameters.basics = $uiDef_basics
         }
     # steps
-    if ($uiDef_steps.count -gt 0) { 
+    if ($uiDef_steps.count -gt 0) {
         $createUiDefinition.parameters.steps = [PSCustomObject]@{}
-        $createUiDefinition.parameters.steps = $uiDef_steps 
+        $createUiDefinition.parameters.steps = $uiDef_steps
         }
     }
 if ($Script:PackageType -eq 'Extension') {
@@ -1351,7 +1351,7 @@ if ($Script:PackageType -eq 'Extension') {
 $createUiDefinition.parameters.outputs = $uiDef_outputs
 #endregion
 
-#region Create Staging Folder 
+#region Create Staging Folder
 $package_name = $X_Input_Tbx_Name.text.replace(' ','')
 $package_publisher = $X_Input_Tbx_Publisher.text.replace(' ','')
 $package_rootfolder = 'Marketplace'
@@ -1442,7 +1442,7 @@ while($Exist)
 }
 
 # log
-Write-Output 'Verifying API endpoint'
+Write-Output 'Verifying ARM endpoint'
 # activity
 try {
     $endpoint_test = Invoke-WebRequest https://$apiEndpoint/metadata/endpoints?api-version=1.0 -ErrorAction SilentlyContinue
@@ -1472,7 +1472,7 @@ $EnvAzureStackAdmin = Add-AzureRmEnvironment -Name 'AzureStackCloud' `
     -ActiveDirectoryServiceEndpointResourceId $apiEndpointMetadata.authentication.audiences[0] `
     -ResourceManagerEndpoint "https://$apiEndpoint/" `
     -GalleryEndpoint $apiEndpointMetadata.galleryEndpoint `
-    -GraphEndpoint $apiEndpointMetadata.graphEndpoint 
+    -GraphEndpoint $apiEndpointMetadata.graphEndpoint
 
 # log
 Write-Output 'Add account to environment'
@@ -1522,7 +1522,7 @@ $StorageKeys = Get-AzureRmStorageAccountKey -ResourceGroupName $ResourceGroup -N
 Write-Output 'Create Storage Context'
 
 #activity
-$StorageContext = New-AzureStorageContext -StorageAccountName $StorageAccountName -StorageAccountKey $StorageKeys.Key1 -Endpoint ($apiEndpoint.Substring($apiEndpoint.IndexOf(".") + 1))
+#$StorageContext = New-AzureStorageContext -StorageAccountName $StorageAccountName -StorageAccountKey $StorageKeys.Key1 -Endpoint ($apiEndpoint.Substring($apiEndpoint.IndexOf(".") + 1))
 $key1 = $StorageKeys | Where-Object {$_.KeyName -eq "key1" } | Select-Object -ExpandProperty Value
 $StorageContext = New-AzureStorageContext -StorageAccountName $StorageAccountName -StorageAccountKey $Key1 -Endpoint ($apiEndpoint.Substring($apiEndpoint.IndexOf(".") + 1))
 
@@ -1639,7 +1639,7 @@ $X_Blade_Preview.Visibility = 'Visible'
 
 $X_Input_Btn_ParamFile.Add_Click({
 F_Browse -title "Select Parameter File" -filter "PS1 (*.ps1)|*.ps1"
-if ($Script:F_Browse_obj.FileName) { 
+if ($Script:F_Browse_obj.FileName) {
     $X_Input_Tbx_ParamFile.Text = $Script:F_Browse_obj.FileName
     F_Get_ParamFile -File $Script:F_Browse_obj.FileName
     F_Validation -field 'X_Input_Tbx_Name' -field_value $X_Input_Tbx_Name.Text -regex $X_Input_Tbx_Name.tag.regex -message $X_Input_Tbx_Name.tag.errormessage -columnwidth 258
@@ -1723,7 +1723,7 @@ F_Validation `
 
 $X_Input_Btn_Icon40.Add_Click({
 F_Browse -title "Select Image" -filter "Image Files (*.png, *.jpg)| *.png;*.jpg"
-if ($Script:F_Browse_obj.FileName) { 
+if ($Script:F_Browse_obj.FileName) {
     $X_Input_Tbx_Icon40.Text = $Script:F_Browse_obj.FileName
     F_Validation `
         -field 'X_Input_Tbx_Icon40' `
@@ -1755,7 +1755,7 @@ else {$X_Preview_Img_Icon40.Source = $null}
 
 $X_Input_Btn_Icon90.Add_Click({
 F_Browse -title "Select Image" -filter "Image Files (*.png, *.jpg)| *.png;*.jpg"
-if ($Script:F_Browse_obj.FileName) { 
+if ($Script:F_Browse_obj.FileName) {
     $X_Input_Tbx_Icon90.Text = $Script:F_Browse_obj.FileName
     F_Validation `
         -field 'X_Input_Tbx_Icon90' `
@@ -1779,7 +1779,7 @@ F_Validation `
 
 $X_Input_Btn_Icon115.Add_Click({
 F_Browse -title "Select Image" -filter "Image Files (*.png, *.jpg)| *.png;*.jpg"
-if ($Script:F_Browse_obj.FileName) { 
+if ($Script:F_Browse_obj.FileName) {
     $X_Input_Tbx_Icon115.Text = $Script:F_Browse_obj.FileName
     F_Validation `
         -field 'X_Input_Tbx_Icon115' `
@@ -1803,7 +1803,7 @@ F_Validation `
 
 $X_Input_Btn_Icon255.Add_Click({
 F_Browse -title "Select Image" -filter "Image Files (*.png, *.jpg)| *.png;*.jpg"
-if ($Script:F_Browse_obj.FileName) { 
+if ($Script:F_Browse_obj.FileName) {
     $X_Input_Tbx_Icon255.Text = $Script:F_Browse_obj.FileName
     F_Validation `
         -field 'X_Input_Tbx_Icon255' `
@@ -1827,7 +1827,7 @@ F_Validation `
 
 $X_Input_Btn_Screenshot.Add_Click({
 F_Browse -title "Select Image" -filter "Image Files (*.png, *.jpg)| *.png;*.jpg"
-if ($Script:F_Browse_obj.FileName) { 
+if ($Script:F_Browse_obj.FileName) {
     $X_Input_Tbx_Screenshot.Text = $Script:F_Browse_obj.FileName
     F_Validation `
         -field 'X_Input_Tbx_Screenshot' `
@@ -1927,7 +1927,7 @@ if ($Script:F_Browse_obj.FileName) {
 
 $x_Params_Tree_View.Add_SelectedItemChanged({
 F_Validation -field 'X_Params_Tbx_RemoveStep' -field_value $X_Params_Tbx_RemoveStep.Text -columnwidth 180
-# if the selected item is a parameter (by checking the tag of the parent item) 
+# if the selected item is a parameter (by checking the tag of the parent item)
 if ($x_Params_Tree_View.SelectedItem.parent.tag -ne '@TreeViewRoot@'){
     # Show Parameter Properties Panel
     $X_ParamType_Stp_Param.Visibility ='Visible'
@@ -1941,7 +1941,7 @@ if ($x_Params_Tree_View.SelectedItem.parent.tag -ne '@TreeViewRoot@'){
     $X_ParamType_Tbl_ParamType.text = $GridSelectedItem.type
     $X_ParamType_Tbl_uiType.text = $GridSelectedItem.uiType
     }
-# if the selected item is a step (by checking the tag of the parent item) 
+# if the selected item is a step (by checking the tag of the parent item)
 if ($x_Params_Tree_View.SelectedItem.parent.tag -eq '@TreeViewRoot@'){
     # Show ParamType Blade
     $X_Blade_ParamType.Visibility = 'Visible'
@@ -1959,8 +1959,8 @@ $X_Params_Btn_AddStep.Add_Click({
 F_Validation -field 'X_Params_Tbx_AddStep' -field_value $X_Params_Tbx_AddStep.Text -regex $X_Params_Tbx_AddStep.tag.regex -message $X_Params_Tbx_AddStep.tag.errormessage -columnwidth 180
 
 $validation = $X_Params_Tbx_AddStep.parent.children | where {$_.GetType().fullname -eq 'System.Windows.Controls.Button' -and $_.Content -eq '!' -and $_.visibility -eq 'visible'}
-if(!($validation)){     
-    F_Add_TreeItem -step $X_Params_Tbx_AddStep.Text 
+if(!($validation)){
+    F_Add_TreeItem -step $X_Params_Tbx_AddStep.Text
     $X_Params_Tbx_AddStep.Text = $null
     }
 })
@@ -2039,7 +2039,7 @@ $X_DashBoard.Visibility = 'Visible'
 $X_Publish_Btn_Package.Add_Click({
 F_Browse -title "Select Marketplace item package file" -filter "Marketplace Item Package (*.azpkg)|*.azpkg"
 
-if ($Script:F_Browse_obj.FileName) { 
+if ($Script:F_Browse_obj.FileName) {
     $X_Publish_Tbx_Package.Text = $Script:F_Browse_obj.FileName
     F_Validation -field 'X_Publish_Tbx_Package' -field_value $X_Publish_Tbx_Package.Text -extension '.azpkg' -columnwidth 190
     }
@@ -2051,13 +2051,13 @@ F_Validation -field 'X_Publish_Tbx_Package' -field_value $X_Publish_Tbx_Package.
 
 $X_Publish_Pwb_Password1.Add_LostFocus({
 if ($X_Publish_Pwb_Password2.Password -ne ''){
-    F_Validation -field 'X_Publish_Pwb_Password1' -field_value $X_Publish_Pwb_Password1.Password -compare $X_Publish_Pwb_Password2.Password -columnwidth 258 
+    F_Validation -field 'X_Publish_Pwb_Password1' -field_value $X_Publish_Pwb_Password1.Password -compare $X_Publish_Pwb_Password2.Password -columnwidth 258
     }
 })
 
 $X_Publish_Pwb_Password2.Add_LostFocus({
 if ($X_Publish_Pwb_Password1.Password -ne ''){
-    F_Validation -field 'X_Publish_Pwb_Password2' -field_value $X_Publish_Pwb_Password2.Password -compare $X_Publish_Pwb_Password1.Password -columnwidth 258 
+    F_Validation -field 'X_Publish_Pwb_Password2' -field_value $X_Publish_Pwb_Password2.Password -compare $X_Publish_Pwb_Password1.Password -columnwidth 258
     }
 })
 
@@ -2070,7 +2070,7 @@ F_Validation -field 'X_Publish_Tbx_Endpoint' -field_value $X_Publish_Tbx_Endpoin
 $validation = (Get-Variable | where {($_.name -match 'X_Publish_Tbx') -or ($_.name -match 'X_Publish_Pwb')}).value.parent.children | where {$_.GetType().fullname -eq 'System.Windows.Controls.Button' -and $_.Content -eq '!' -and $_.visibility -eq 'visible'}
 if ((!($validation)) -and ($Script:job.state -ne 'running')){
     $X_Publish_Lsv_Log.Items.Clear()
-    $X_Publish_Lsv_Log.Items.Add("Starting publishing job") 
+    $X_Publish_Lsv_Log.Items.Add("Starting publishing job")
     F_PublishPackage }
 })
 
@@ -2078,7 +2078,7 @@ $timer.Add_Tick({
     if ($Script:job.state -eq 'running') {
         [array]$result = receive-job $Script:job
         if ($result.count -ne '0') {
-            $result | foreach { 
+            $result | foreach {
                 $X_Publish_Lsv_Log.Items.Add("$_")
                 $Script:loglast = $_
             }
@@ -2091,8 +2091,8 @@ $timer.Add_Tick({
                 }
             }
         }
-    elseif ($Script:job.state -eq 'completed') { 
-        $timer.Stop() 
+    elseif ($Script:job.state -eq 'completed') {
+        $timer.Stop()
         $result = receive-job $Script:job
         $result | foreach { $X_Publish_Lsv_Log.Items.Add("$_") }
         $X_Publish_Lsv_Log.Items.Add("Job finished")
@@ -2103,7 +2103,7 @@ $timer.Add_Tick({
         $result | foreach { $X_Publish_Lsv_Log.Items.Add("$_") }
         $X_Publish_Lsv_Log.Items.Add("Job Failed")
         }
-    else { $timer.Stop() } 
+    else { $timer.Stop() }
     })
 
 $X_Publish_Btn_Close.Add_Click({
@@ -2124,4 +2124,3 @@ if ($script:job.id){ remove-job $script:job.id -ErrorAction SilentlyContinue }
 #endregion Events
 
 $Form.ShowDialog() | out-null
-
